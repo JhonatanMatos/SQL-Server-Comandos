@@ -89,6 +89,7 @@ insert into cidade(codCidade,descricao,populacao) values (1, 'SBC', 4500)
 
 insert into cidade(codCidade,descricao,populacao) values (2, 'Maua', 14500)
 ```
+> Como o campo descrição é not null, se tentar adicionar uma cidade sem descrição não conseguirá
 
 ## **Alterando dados da tabela**
 ```sql
@@ -101,6 +102,11 @@ update cidade set populacao = 10 where codCidade = 2
 
 > where - filtrar o campo que deseja alterar
 
+```sql
+update Forum set codCidade = 1
+```
+> Atualizar todos os Foruns da cidade com código igual a 1
+
 ## **Excluindo dados da tabela**
 ```sql
 delete from cidade where codCidade = 1
@@ -110,11 +116,14 @@ delete from cidade where codCidade = 2
 
 > from - se refere a tabela que deseja realizar o comando
 
+> Caso seja uma Fk de outra tabela não conseguirá apagar o dado
+
 ## **Selecionando todos os campos da tabela**
 ```sql
 select * from cidade
 ```
 > O * significa que irá selecionar todos os campos da tabela
+
 ## **Selecionando alguns campos da tabela**
 ```sql
 select codCidade, descricao from cidade
@@ -225,3 +234,125 @@ select top 4 * from funcionarios order by func_salario desc
 > order by - ordena os dados por um campo escolhido
 
 > desc - exibe o resultado em ordem decrescente
+
+## **Exercícios de Criação de Tabelas**
+> 1-) Crie uma tabela chamada Advogado com código, nome e data de nascimento.
+```sql
+create table Advogado
+(
+    codAdvogado int primary key,
+    nome varchar(30) not null,
+    data_nasc smalldatetime not null,
+)
+```
+> ```smalldatetime(YYYY-MM-DD hh:mm:ss)````
+
+> 2-) Adicione na tabela Processo um campo que faça relacionamento com a tabela Advogado
+```sql
+alter table processo
+    add codAdvogado int not null
+        foreign key(codAdvogado) references
+                    Advogado(codAdvogado)
+```
+> 3-) Crie uma tabela chamada Forum com código, nome, endereço, código da cidade(FK).
+```sql
+create table Forum(
+    codForum int primary key,
+    nome varchar(80),
+    endereco varchar(100),
+    codCidade int foreign key references
+                        cidade(codCidade)
+)
+```
+> 4-) Adicione na tabela Advogado um campo chamado numOAB.
+```sql
+alter table Advogado
+    numOAB varchar(10) not null
+```
+
+## **Usando o comando INNER JOIN**
+> Operação de junção que combina uma ou mais tabelas do banco de dados.
+
+```sql
+select * from funcionarios f inner join setores s on (f.setor_id) = (s.setor_id)
+```
+### **ou**
+```sql
+select * from funcionarios f, setor s where f.setor_id = s.setor_id
+```
+## **Usando o comando ORDER BY**
+> Listar os funcionários por ordem alfabetica
+```sql
+select * from funcionarios order by func_nome
+```
+> Listar os funcionários por salário em ordem crescente
+```sql
+select * from funcionarios order by func_salario
+```
+> Listar os funcionários por salário em ordem descrescente
+```sql
+select * from funcionarios order by func_salario desc
+```
+
+> Ordenar por mais de um campo(ordena pelo primeiro campo e depois ordena pelos outros)
+```sql
+select * from funcionarios order by func_salario, func_nome
+```
+
+## **Usando Funções de Agrupamento**
+### **COUNT**
+```sql
+select COUNT(*) from funcionarios where gerente_id = 1
+```
+> Retorna a quantidade de funcinários que possui o gerente 1
+
+### **MAX**
+```sql
+select MAX(func_salario) from funcionarios
+```
+> Retorna o maior salário (somente o valor)
+
+### **TOP**
+```sql
+select top 1 func_nome from funcionarios order by func_salario desc
+```
+> Retorna o nome do funcionário com maior salário
+
+```sql
+select top 1 func_nome from funcionarios order by func_salario
+```
+> Retorna o nome do funcionário com menor salário
+
+```sql
+select top 3 func_nome from funcionarios order by func_salario desc
+```
+> Retorna o nome dos 3 funcionários com maior salário
+
+### **SUM**
+```sql
+select SUM(func_salario) as Salario from funcionarios
+```
+> Retorna a soma de todos os salários
+
+```sql
+select SUM(func_salario) Salario, COUNT(*) QtdeDeFunc from funcionarios
+```
+> Retorna a soma de todos os salários e também a quantidade de funcionários
+
+## **Usando GROUP BY**
+> Listar o total pago aos funcionários de cada setor
+```sql
+select setor_id as Setor, SUM(func_salario) Total from funcionarios group by setor_id
+```
+> Listar quantos funcionários possuem em cada setor separados por ano de nascimento
+```sql
+select  setor_id Setor, YEAR(func_dataNasc) Ano, COUNT(*) Qtde from funcionarios group by setor_id, YEAR(func_dataNasc) order by setor_id, YEAR(func_dataNasc)
+```
+> A função YEAR() retorna apenas o ano correspondente da data escolhida. Assim como também possui as funções MOUNTH() e DAY().
+
+### **Having**
+> Usado somente quando tiver a clausula GROUP BY, funciona basicamente igual o WHERE
+```sql
+select COUNT(*) qtd, setor_id from funcionarios group by setor_id having COUNT(*) >= 5
+```
+> Lista a quantidade de funcionários nos setores que possuem mais de 5 funcionários
