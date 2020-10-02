@@ -356,3 +356,16 @@ select  setor_id Setor, YEAR(func_dataNasc) Ano, COUNT(*) Qtde from funcionarios
 select COUNT(*) qtd, setor_id from funcionarios group by setor_id having COUNT(*) >= 5
 ```
 > Lista a quantidade de funcionários nos setores que possuem mais de 5 funcionários
+
+## **Usando UNION**
+> Usado quando se quer combinar duas colunas similares que não possuem relacionamento direto. Observação: as colunas devem ter o mesmo tipo de dado.
+```sql
+select func_id, func_nome from funcionarios union select setor_id, setor_nome from setores
+```
+### **UNION ALL**
+> A principal diferença entre UNION e UNION ALL é que no caso de UNION ALL ele não elimina os valores duplicados, ou seja, aparecem mais de uma vez os mesmos valores. Enquanto no UNION isso não acontece.
+```sql
+select * from setores union all select * from setores
+```
+
+## **Usando Cast**
